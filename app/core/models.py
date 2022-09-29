@@ -9,6 +9,18 @@ from django.contrib.auth.models import (
 )
 
 
+class UserManager(BaseUserManager):
+    """Manager of users."""
+
+    def create_user(self, email, password=None, **extra_fields):
+        """Create, save and return a new user."""
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+
+        return user
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     """User in the system."""
     email = models.EmailField(max_length=255, unique=True)
@@ -20,6 +32,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active : default is active but can be switched off to false as well
     is_staff : used to login to Django admin panel
     """
+
+    objects = UserManager()
 
     USERNAME_FIELD = 'email'
     """
